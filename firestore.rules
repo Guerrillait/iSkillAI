@@ -1,0 +1,178 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 0. Global Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // --- Hardened Global Helpers ---
+    function isSignedIn() { return request.auth != null; }
+    function isOwner(userId) { return isSignedIn() && request.auth.uid == userId; }
+    function isValidId(id) { return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$'); }
+    function incoming() { return request.resource.data; }
+    function existing() { return resource.data; }
+    function isVerifiedUser() { return isSignedIn() && request.auth.token.email_verified == true; }
+
+    match /test/connection {
+      allow read: if true;
+    }
+
+    // --- Validation Helpers ---
+    function isValidUser(data) {
+      return data.keys().hasAll(['firstName', 'email', 'createdAt'])
+        && data.firstName is string && data.firstName.size() <= 100
+        && (data.get('lastName', null) == null || (data.lastName is string && data.lastName.size() <= 100))
+        && (data.get('dob', null) == null || (data.dob is string && (data.dob == '' || data.dob.matches('^\\d{4}-\\d{2}-\\d{2}$'))))
+        && data.email is string && data.email.size() <= 300
+        && (data.get('phone', null) == null || (data.phone is string && data.phone.size() <= 20))
+        && (data.get('department', null) == null || (data.department is string && data.department.size() <= 100))
+        && (data.get('photoURL', null) == null || (data.photoURL is string && data.photoURL.size() <= 200000))
+        && (data.get('linkedinUrl', null) == null || (data.linkedinUrl is string && data.linkedinUrl.size() <= 500))
+        && (data.get('githubUrl', null) == null || (data.githubUrl is string && data.githubUrl.size() <= 500))
+        && (data.get('portfolioUrl', null) == null || (data.portfolioUrl is string && data.portfolioUrl.size() <= 500))
+        && (data.get('primarySector', null) == null || (data.primarySector is string && data.primarySector.size() <= 100))
+        && (data.get('skillScore', null) == null || (data.skillScore is number && data.skillScore >= 0 && data.skillScore <= 100))
+        && (data.get('technicalDepth', null) == null || data.technicalDepth is number)
+        && (data.get('activity', null) == null || data.activity is number)
+        && (data.get('consistency', null) == null || data.consistency is number)
+        && (data.get('network', null) == null || data.network is number)
+        && (data.get('diversity', null) == null || data.diversity is number)
+        && (data.get('isAnalyzed', null) == null || data.isAnalyzed is bool)
+        && (data.get('semanticFeedback', null) == null || (data.semanticFeedback is string && data.semanticFeedback.size() <= 1000))
+        && (data.createdAt == request.time || data.get('createdAt', null) != null);
+    }
+
+    function isValidPost(data) {
+      return data.keys().hasAll(['authorId', 'authorName', 'content', 'createdAt'])
+        && data.authorId == request.auth.uid
+        && data.authorName is string && data.authorName.size() <= 200
+        && data.content is string && data.content.size() <= 10000
+        && (data.createdAt == request.time || data.get('createdAt', null) != null)
+        && (data.get('domain', null) == null || (data.domain is string && data.domain.size() <= 100))
+        && (data.get('media', null) == null || (data.media is string && data.media.size() <= 1500000))
+        && (data.get('mediaType', null) == null || (data.mediaType in ['image', 'video']))
+        && (data.get('reactions', null) == null || data.reactions is map);
+    }
+
+    function isValidComment(data) {
+      return data.keys().hasAll(['authorId', 'authorName', 'content', 'createdAt'])
+        && data.authorId == request.auth.uid
+        && data.authorName is string && data.authorName.size() <= 200
+        && data.content is string && data.content.size() <= 2000
+        && (data.createdAt == request.time || data.get('createdAt', null) != null)
+        && (data.get('authorPhoto', null) == null || (data.authorPhoto is string && data.authorPhoto.size() <= 200000));
+    }
+
+    function isValidGroup(data) {
+      return data.keys().hasAll(['name', 'description', 'category', 'creatorId', 'memberCount', 'createdAt'])
+        && data.name is string && data.name.size() <= 100 && data.name.size() > 0
+        && data.description is string && data.description.size() <= 1000
+        && data.category is string && data.category.size() <= 50
+        && data.creatorId == request.auth.uid
+        && data.memberCount is number && data.memberCount >= 0
+        && (data.createdAt == request.time || data.get('createdAt', null) != null);
+    }
+
+    function isValidGroupPost(data) {
+      return data.keys().hasAll(['groupId', 'authorId', 'authorName', 'content', 'createdAt'])
+        && data.groupId is string && data.groupId.size() <= 128
+        && data.authorId == request.auth.uid
+        && data.authorName is string && data.authorName.size() <= 200
+        && data.content is string && data.content.size() <= 5000
+        && (data.createdAt == request.time || data.get('createdAt', null) != null);
+    }
+
+    function isValidConnection(data) {
+      return data.userIds is list && data.userIds.size() == 2
+        && (request.auth.uid in data.userIds)
+        && data.status in ['pending', 'accepted']
+        && (data.createdAt == request.time || data.get('createdAt', null) != null)
+        && (data.updatedAt == request.time || data.get('updatedAt', null) != null);
+    }
+
+    function isValidNotification(data) {
+      return data.keys().hasAll(['userId', 'type', 'title', 'content', 'read', 'createdAt'])
+        && data.userId is string && data.userId.size() <= 128
+        && data.type is string && data.type.size() <= 50
+        && data.title is string && data.title.size() <= 200
+        && data.content is string && data.content.size() <= 1000
+        && data.read is bool
+        && (data.createdAt == request.time || data.get('createdAt', null) != null)
+        && (data.get('data', null) == null || data.data is map);
+    }
+
+    match /users/{userId} {
+      allow get, list: if isSignedIn();
+      allow create: if isOwner(userId) && isValidUser(incoming());
+      allow update: if isOwner(userId) && isValidUser(incoming());
+    }
+    
+    match /notifications/{notificationId} {
+      allow read: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && isValidNotification(incoming());
+      allow update: if isSignedIn() && resource.data.userId == request.auth.uid 
+                    && incoming().diff(existing()).affectedKeys().hasOnly(['read']);
+      allow delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+    }
+
+    match /connections/{connectionId} {
+      allow read: if isSignedIn() && (request.auth.uid in existing().userIds);
+      allow create: if isSignedIn() && isValidConnection(incoming());
+      allow update: if isSignedIn() && (request.auth.uid in existing().userIds) && isValidConnection(incoming());
+      allow delete: if isSignedIn() && (request.auth.uid in existing().userIds);
+    }
+
+    match /posts/{postId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && isValidPost(incoming());
+      allow update: if isSignedIn() && (
+        // Action 1: Add/Remove Reaction (Any signed in user)
+        (incoming().diff(existing()).affectedKeys().hasOnly(['reactions']) && incoming().reactions is map)
+        ||
+        // Action 2: Author edit
+        (isOwner(existing().authorId) && isValidPost(incoming()))
+      );
+      allow delete: if isOwner(existing().authorId);
+
+      match /comments/{commentId} {
+        allow read: if isSignedIn();
+        allow create: if isSignedIn() && isValidComment(incoming());
+        allow delete: if isOwner(existing().authorId);
+      }
+    }
+
+    match /groups/{groupId} {
+      allow read, list: if isSignedIn();
+      allow create: if isSignedIn() && isValidGroup(incoming());
+      allow update: if isSignedIn() && isValidGroup(incoming()) && (
+        incoming().diff(existing()).affectedKeys().hasOnly(['memberCount'])
+        || isOwner(existing().creatorId)
+      );
+
+      match /members/{memberId} {
+        allow read: if isSignedIn();
+        allow create: if isSignedIn() && incoming().userId == request.auth.uid;
+      }
+
+      match /posts/{postId} {
+        allow read: if isSignedIn();
+        allow create: if isSignedIn() && isValidGroupPost(incoming());
+        allow delete: if isOwner(existing().authorId);
+      }
+    }
+
+    match /conversations/{conversationId} {
+      allow read: if isSignedIn() && (request.auth.uid in existing().participants);
+      allow create: if isSignedIn() && incoming().participants.size() == 2 && (request.auth.uid in incoming().participants);
+      allow update: if isSignedIn() && (request.auth.uid in existing().participants)
+                    && incoming().diff(existing()).affectedKeys().hasOnly(['lastMessage', 'updatedAt']);
+      
+      match /messages/{messageId} {
+        allow read: if isSignedIn() && (request.auth.uid in get(/databases/$(database)/documents/conversations/$(conversationId)).data.participants);
+        allow create: if isSignedIn() && incoming().senderId == request.auth.uid 
+                      && (request.auth.uid in get(/databases/$(database)/documents/conversations/$(conversationId)).data.participants);
+      }
+    }
+  }
+}

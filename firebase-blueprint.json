@@ -1,0 +1,170 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "Represents a professional profile with skills and social links.",
+      "type": "object",
+      "properties": {
+        "firstName": { "type": "string", "description": "User's first name" },
+        "lastName": { "type": "string", "description": "User's last name" },
+        "dob": { "type": "string", "description": "Date of birth in YYYY-MM-DD format" },
+        "email": { "type": "string", "description": "Email address" },
+        "phone": { "type": "string", "description": "Phone number" },
+        "department": { "type": "string", "description": "Academic department" },
+        "photoURL": { "type": "string", "description": "Profile picture URL" },
+        "linkedinUrl": { "type": "string", "description": "LinkedIn profile URL" },
+        "githubUrl": { "type": "string", "description": "GitHub profile URL" },
+        "portfolioUrl": { "type": "string", "description": "Additional portfolio link" },
+        "primarySector": { "type": "string", "description": "AI-detected primary professional sector" },
+        "skillScore": { "type": "number", "description": "AI-calculated skill score (0-100)" },
+        "semanticFeedback": { "type": "string" },
+        "technicalDepth": { "type": "number" },
+        "activity": { "type": "number" },
+        "consistency": { "type": "number" },
+        "network": { "type": "number" },
+        "diversity": { "type": "number" },
+        "isAnalyzed": { "type": "boolean", "description": "Whether the profile has been analyzed by AI" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Document creation timestamp" },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Last update timestamp" }
+      },
+      "required": ["firstName", "lastName", "dob", "email", "phone", "department", "linkedinUrl", "createdAt"]
+    },
+    "Post": {
+      "title": "Post",
+      "description": "A professional social post",
+      "type": "object",
+      "properties": {
+        "authorId": { "type": "string" },
+        "authorName": { "type": "string" },
+        "content": { "type": "string" },
+        "domain": { "type": "string" },
+        "media": { "type": "string", "description": "Base64 encoded image or video" },
+        "mediaType": { "type": "string", "enum": ["image", "video"] },
+        "reactions": { "type": "object", "description": "Map of emoji to list of user IDs" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["authorId", "authorName", "content", "createdAt"]
+    },
+    "Conversation": {
+      "title": "Conversation",
+      "description": "A 1-to-1 chat",
+      "type": "object",
+      "properties": {
+        "participants": { "type": "array", "items": { "type": "string" } },
+        "lastMessage": { "type": "string" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["participants", "updatedAt"]
+    },
+    "Group": {
+      "title": "Group",
+      "description": "A community group",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "category": { "type": "string" },
+        "creatorId": { "type": "string" },
+        "memberCount": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "description", "category", "creatorId", "memberCount", "createdAt"]
+    },
+    "GroupPost": {
+      "title": "GroupPost",
+      "description": "A post within a group",
+      "type": "object",
+      "properties": {
+        "groupId": { "type": "string" },
+        "authorId": { "type": "string" },
+        "authorName": { "type": "string" },
+        "content": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["groupId", "authorId", "authorName", "content", "createdAt"]
+    },
+    "Connection": {
+      "title": "Connection",
+      "description": "A professional connection between two users",
+      "type": "object",
+      "properties": {
+        "userIds": { "type": "array", "items": { "type": "string" } },
+        "status": { "type": "string", "enum": ["pending", "accepted"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userIds", "status", "createdAt", "updatedAt"]
+    },
+    "Notification": {
+      "title": "Notification",
+      "description": "A user notification",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "type": { "type": "string" },
+        "title": { "type": "string" },
+        "content": { "type": "string" },
+        "link": { "type": "string" },
+        "read": { "type": "boolean" },
+        "data": { "type": "object", "description": "Optional metadata for the notification" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "type", "title", "content", "read", "createdAt"]
+    },
+    "Comment": {
+      "title": "Comment",
+      "description": "A discussion point on a post",
+      "type": "object",
+      "properties": {
+        "authorId": { "type": "string" },
+        "authorName": { "type": "string" },
+        "authorPhoto": { "type": "string" },
+        "content": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["authorId", "authorName", "content", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profiles and skill data"
+    },
+    "/notifications/{notificationId}": {
+      "schema": "Notification",
+      "description": "User notifications"
+    },
+    "/connections/{connectionId}": {
+      "schema": "Connection",
+      "description": "Professional connections"
+    },
+    "/posts/{postId}": {
+      "schema": "Post",
+      "description": "Social feed posts"
+    },
+    "/posts/{postId}/comments/{commentId}": {
+      "schema": "Comment",
+      "description": "Discussion comments on a post"
+    },
+    "/groups/{groupId}": {
+      "schema": "Group",
+      "description": "Community groups"
+    },
+    "/groups/{groupId}/members/{userId}": {
+      "schema": "object",
+      "description": "Group members"
+    },
+    "/groups/{groupId}/posts/{postId}": {
+      "schema": "GroupPost",
+      "description": "Posts within a group"
+    },
+    "/conversations/{conversationId}": {
+      "schema": "Conversation",
+      "description": "Chat conversations"
+    },
+    "/conversations/{conversationId}/messages/{messageId}": {
+      "schema": "Message",
+      "description": "Direct messages"
+    }
+  }
+}
