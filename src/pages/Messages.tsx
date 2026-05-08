@@ -8,7 +8,7 @@ import {
 } from 'firebase/firestore';
 import { 
   Send, MessageSquare, ArrowLeft, Loader2, 
-  ShieldCheck, User, Search, Zap, Cpu, Newspaper, Users, Bell
+  ShieldCheck, User, Search, Zap, Cpu, Newspaper, Users, Bell, Menu, Home
 } from 'lucide-react';
 import Sidebar from '../components/Sidebar';
 import NotificationBell from '../components/NotificationBell';
@@ -336,6 +336,8 @@ export default function Messages() {
       {/* Modern Sidebar - Conversations */}
       <aside className={`w-full md:w-[26rem] h-full flex-shrink-0 bg-white backdrop-blur-2xl border-r border-slate-100 flex flex-col relative z-20 ${selectedChat ? 'hidden md:flex' : 'flex'} transition-all duration-500 shadow-xl shadow-slate-200/50`}>
         <div className="p-8 md:p-10">
+
+
            <div className="flex items-center justify-between mb-10">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-center text-cyan-600 group shadow-sm">
@@ -629,12 +631,22 @@ export default function Messages() {
                    Select a connection to establish a secure, verified uplink through the professional singularity.
                  </p>
                </div>
-               <button 
-                onClick={() => navigate('/search')}
-                className="px-8 py-3.5 rounded-2xl bg-slate-950 text-white text-xs font-bold uppercase tracking-wider shadow-xl hover:bg-cyan-600 transition-all flex items-center gap-3 mx-auto"
-               >
-                 <Zap size={14} /> Scan Network
-               </button>
+               <div className="flex flex-wrap gap-4 justify-center items-center">
+                 <button 
+                   id="scan-network-placeholder-btn"
+                   onClick={() => navigate('/search')}
+                   className="px-8 py-3.5 rounded-2xl bg-slate-950 text-white text-xs font-bold uppercase tracking-wider shadow-xl hover:bg-cyan-600 transition-all flex items-center gap-2 cursor-pointer"
+                 >
+                   <Zap size={14} /> Scan Network
+                 </button>
+                 <button 
+                   id="go-home-placeholder-btn"
+                   onClick={() => navigate('/dashboard')}
+                   className="px-8 py-3.5 rounded-2xl bg-white border border-slate-200 text-slate-700 text-xs font-bold uppercase tracking-wider shadow-sm hover:bg-slate-50 transition-all flex items-center gap-2 cursor-pointer"
+                 >
+                   <Home size={14} className="text-cyan-600" /> Back to Profile
+                 </button>
+               </div>
              </div>
           </div>
         )}

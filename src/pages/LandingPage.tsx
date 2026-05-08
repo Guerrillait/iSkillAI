@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Shield, Cpu, Share2, Search, ArrowRight, UserCheck, Calendar, Link2, Loader2, Hash } from 'lucide-react';
+import { Shield, Cpu, Share2, Search, ArrowRight, UserCheck, Calendar, Link2, Loader2, Hash, Zap } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { db } from '../lib/firebase';
 import { collection, query, where, getDocs } from 'firebase/firestore';
@@ -375,52 +375,84 @@ export default function LandingPage() {
         </motion.div>
       </header>
 
-      {/* 3. Features Section */}
-      <section id="features" className="relative bg-slate-50/50 py-32 px-6 md:px-10 border-y border-slate-100 z-10">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-20">
-            <h2 className="text-4xl font-bold mb-4 text-slate-900">Powered by Advanced Research</h2>
-            <p className="text-slate-600">Our platform implements the methodology verified in our recent thesis study.</p>
-          </div>
+      {/* 3. Research/Features Section */}
+      <section id="features" className="relative py-40 px-6 md:px-10 overflow-hidden bg-slate-50/30">
+        {/* Section Decorative Elements */}
+        <div className="absolute top-0 right-0 w-1/3 h-1/3 bg-blue-50/50 blur-[100px] rounded-full pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-1/3 h-1/3 bg-cyan-50/50 blur-[100px] rounded-full pointer-events-none" />
+        
+        <div className="max-w-7xl mx-auto relative z-10">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-24"
+          >
+            <motion.div 
+              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900/5 border border-slate-950/10 text-slate-500 text-[10px] font-black uppercase tracking-[0.3em] mb-6 font-mono"
+            >
+              Academic Foundation
+            </motion.div>
+            <h2 className="text-5xl md:text-7xl font-serif mb-8 text-slate-950 tracking-tight leading-[1.05] italic">
+              Powered by Advanced <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-600 to-blue-700">Research Models</span>
+            </h2>
+            <p className="text-slate-600 max-w-3xl mx-auto text-xl font-academic leading-relaxed italic">
+              Our platform implements the methodology verified in our recent thesis study at Daffodil International University, bridging academic theory with professional practice.
+            </p>
+          </motion.div>
           
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
               {
-                icon: <Share2 className="w-7 h-7 text-cyan-600" />,
+                icon: <Share2 className="w-8 h-8 text-cyan-600" />,
                 title: "Multi-Platform Fusion",
-                desc: "Aggregates behavioral data from GitHub, LinkedIn, and more for a 360-degree professional view."
+                desc: "Aggregates behavioral data from GitHub, LinkedIn, and more for a 360-degree professional view.",
+                accent: "cyan"
               },
               {
-                icon: <Cpu className="w-7 h-7 text-blue-600" />,
-                title: "BERT Semantic Analysis",
-                desc: "Fine-tuned BERT models understand the context of your projects with 93% classification accuracy."
+                icon: <Cpu className="w-8 h-8 text-blue-600" />,
+                title: "BERT Semantic Engine",
+                desc: "Fine-tuned BERT models understand the context of your projects with 93% classification accuracy.",
+                accent: "blue"
               },
               {
-                icon: <Shield className="w-7 h-7 text-indigo-600" />,
+                icon: <Zap className="w-8 h-8 text-amber-600" />,
+                title: "CELBE Framework",
+                desc: "Cross-domain Expertise Latency & Behavioral Entropy model to measure professional stability and maturity.",
+                accent: "amber"
+              },
+              {
+                icon: <Shield className="w-8 h-8 text-indigo-600" />,
                 title: "Identity Verification",
-                desc: "Prevent impersonation with a triple-key verification system (Name + DOB + Social Link)."
+                desc: "Prevent impersonation with a triple-key verification system (Name + DOB + Social Link).",
+                accent: "indigo"
               }
             ].map((feature, idx) => (
               <motion.div 
                 key={idx}
-                whileHover={{ y: -10 }}
-                className="p-8 rounded-[2.5rem] bg-white border border-slate-100 hover:border-cyan-500/30 transition-all duration-500 group shadow-sm hover:shadow-xl"
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: idx * 0.1 }}
+                whileHover={{ y: -12, scale: 1.02 }}
+                className="group relative p-10 rounded-[3rem] bg-white/70 backdrop-blur-xl border border-slate-200/60 hover:border-cyan-500/30 transition-all duration-500 shadow-xl shadow-slate-200/20"
               >
-                <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mb-8 border border-slate-100 group-hover:border-slate-200 transition-colors shadow-inner">
-                  {feature.icon}
+                {/* Decorative Hover Glow */}
+                <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-cyan-50/30 opacity-0 group-hover:opacity-100 rounded-[3rem] transition-opacity duration-700" />
+                
+                <div className="relative z-10">
+                  <div className={`w-20 h-20 bg-slate-50 rounded-[2rem] flex items-center justify-center mb-10 border border-slate-100 group-hover:bg-white group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 shadow-inner group-hover:shadow-lg group-hover:shadow-${feature.accent}-500/10`}>
+                    {feature.icon}
+                  </div>
+                  <h3 className="text-xl font-display font-bold mb-4 text-slate-900 group-hover:text-cyan-600 transition-colors duration-300 tracking-tight">
+                    {feature.title}
+                  </h3>
+                  <div className="w-12 h-1 bg-slate-100 group-hover:w-20 group-hover:bg-cyan-500 transition-all duration-500 mb-6" />
+                  <p className="text-slate-500 leading-relaxed font-medium transition-colors duration-300 group-hover:text-slate-700">
+                    {feature.desc}
+                  </p>
                 </div>
-                <motion.h3 
-                  whileHover={{ scale: 1.05, x: 5 }}
-                  className="text-2xl font-bold mb-4 text-slate-900 group-hover:text-cyan-600 transition-all duration-300"
-                >
-                  {feature.title}
-                </motion.h3>
-                <motion.p 
-                  whileHover={{ color: "#000" }}
-                  className="text-slate-600 leading-relaxed transition-colors duration-300"
-                >
-                  {feature.desc}
-                </motion.p>
               </motion.div>
             ))}
           </div>

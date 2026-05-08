@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   Cpu, LogOut, Search, MessageSquare, Zap, 
-  Award, TrendingUp, Newspaper, ShieldCheck, X
+  Award, TrendingUp, Newspaper, ShieldCheck, X, BookOpen
 } from 'lucide-react';
 import { auth, db, handleFirestoreError, OperationType } from '../lib/firebase';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
@@ -45,8 +45,9 @@ export default function Sidebar({
   }, [auth.currentUser]);
 
   const links = [
-    { id: 'news', icon: <Newspaper size={18} />, text: 'Identity Feed', path: '/news-feed', activeColor: 'cyan' },
+    { id: 'news', icon: <Newspaper size={18} />, text: 'Network Feed', path: '/news-feed', activeColor: 'cyan' },
     { id: 'dashboard', icon: <Zap size={18} />, text: 'Unified Profile', path: '/dashboard', activeColor: 'cyan' },
+    { id: 'my-posts', icon: <BookOpen size={18} />, text: 'My Publications', path: '/my-posts', activeColor: 'cyan' },
     { id: 'search', icon: <Search size={18} />, text: 'Intelligent Search', path: '/search', activeColor: 'cyan' },
     { id: 'communities', icon: <Award size={18} />, text: 'Elite Guilds', path: '/communities', activeColor: 'cyan' },
     { id: 'messages', icon: <MessageSquare size={18} />, text: 'Neural Comms', path: '/messages', activeColor: 'cyan', badge: unreadMessages > 0 ? unreadMessages : null },

@@ -175,7 +175,8 @@ export default function Dashboard() {
         linkedinUrl: editData.linkedinUrl || '',
         githubUrl: editData.githubUrl || '',
         portfolioUrl: editData.portfolioUrl || '',
-        isAnalyzed: false,
+        // Only reset analysis if critical social links changed
+        isAnalyzed: profile.isAnalyzed && (editData.linkedinUrl === profile.linkedinUrl && editData.githubUrl === profile.githubUrl),
         updatedAt: serverTimestamp()
       });
       setIsEditing(false);
@@ -310,17 +311,17 @@ export default function Dashboard() {
       const hasLinkedIn = !!profile?.linkedinUrl;
       const hasGitHub = !!profile?.githubUrl;
       
-      const baseScore = 70 + (hasLinkedIn ? 10 : 0) + (hasGitHub ? 15 : 0);
-      const technicalDepth = hasGitHub ? 85 : 60;
+      const baseScore = 75 + (hasLinkedIn ? 8 : 0) + (hasGitHub ? 7 : 0);
+      const technicalDepth = hasGitHub ? 85 : 65;
 
       const fallbackData = {
         primarySector: profile?.primarySector || "Sector Analysis Pending",
-        skillScore: Math.min(95, baseScore + Math.floor(Math.random() * 5)),
+        skillScore: Math.min(95, baseScore),
         technicalDepth: technicalDepth,
-        activity: 75,
-        consistency: 80,
+        activity: 78,
+        consistency: 82,
         network: hasLinkedIn ? 70 : 40,
-        diversity: 65,
+        diversity: 68,
         semanticFeedback: "Stability Protocol Active: Identity verified via metadata. Analysis cycle deferred to next bandwidth window.",
         isAnalyzed: true,
         analysisType: 'STABILITY_PROTOCOL',

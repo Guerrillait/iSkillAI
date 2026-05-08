@@ -47,14 +47,21 @@ export default function Header({
           }}
           className="w-9 h-9 md:w-10 md:h-10 rounded-xl bg-white/50 border border-slate-200 text-slate-400 hover:text-cyan-600 transition-all hover:bg-cyan-600/5 flex items-center justify-center overflow-hidden group shadow-sm shrink-0"
         >
-          {isSidebarCollapsed ? (
+          {isSidebarCollapsed || (typeof window !== 'undefined' && window.innerWidth < 768) ? (
             profile?.photoURL ? (
-              <img src={profile.photoURL} alt="Profile" className="w-full h-full object-cover group-hover:scale-110 transition-transform" referrerPolicy="no-referrer" />
+              <img 
+                src={profile.photoURL} 
+                alt="Profile" 
+                className="w-full h-full object-cover group-hover:scale-110 transition-transform" 
+                referrerPolicy="no-referrer" 
+              />
             ) : (
-              <span className="text-[10px] font-black text-slate-900">{profile?.firstName?.[0]}{profile?.lastName?.[0]}</span>
+              <span className="text-[10px] font-black text-slate-900 italic uppercase">
+                {profile?.firstName?.[0]}{profile?.lastName?.[0]}
+              </span>
             )
           ) : (
-            <Zap size={16} className="text-cyan-600" />
+            <Zap size={16} className="text-cyan-600 transition-transform group-hover:scale-110" />
           )}
         </button>
 

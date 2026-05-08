@@ -131,7 +131,7 @@ export default function Feed({ userProfile }: any) {
 
   const handlePost = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newPost.trim() || !userProfile) return;
+    if ((!newPost.trim() && !mediaFile) || !userProfile) return;
 
     setLoading(true);
     try {
@@ -290,50 +290,72 @@ export default function Feed({ userProfile }: any) {
         className="hidden"
       />
       {/* Create Post */}
-      <div className="bg-white border border-slate-200 p-4 md:p-6 rounded-[2rem] md:rounded-[2.5rem] shadow-xl shadow-slate-200/50">
-        <form onSubmit={handlePost} className="space-y-4">
-           <textarea 
-             value={newPost}
-             onChange={(e) => setNewPost(e.target.value)}
-             placeholder="Share professional insights or achievements..."
-             className="w-full bg-slate-50 border border-slate-100 rounded-2xl md:rounded-3xl p-4 md:p-6 text-sm text-slate-900 focus:outline-none focus:border-cyan-600/30 transition-all resize-none h-28 md:h-32 italic placeholder:text-slate-300"
-           />
-           
-           {mediaFile && (
-             <div className="relative rounded-2xl overflow-hidden border border-slate-100 aspect-video bg-slate-50">
-               {mediaType === 'image' ? (
-                 <img src={mediaFile} className="w-full h-full object-contain" alt="Preview" />
-               ) : (
-                 <video src={mediaFile} className="w-full h-full object-contain" controls />
-               )}
-               <button 
-                 type="button"
-                 onClick={() => { setMediaFile(null); setMediaType(null); }}
-                 className="absolute top-2 right-2 w-8 h-8 rounded-full bg-black/50 backdrop-blur-md flex items-center justify-center text-white hover:bg-red-500 transition-colors"
-               >
-                 <X size={16} />
-               </button>
-             </div>
-           )}
+      <div className="bg-white border border-slate-200/80 p-5 rounded-[1.5rem] shadow-sm hover:border-slate-300/40 transition-all duration-200">
+        <div className="flex items-center gap-2 mb-3 pb-2 border-b border-slate-100">
+          <Zap size={13} className="text-cyan-600 animate-pulse" />
+          <h3 className="text-[9px] font-black uppercase tracking-[0.15em] text-slate-400">Deploy Intellectual Outcome</h3>
+        </div>
 
-           <div className="flex items-center justify-between px-2">
-              <div className="flex items-center gap-4 text-slate-400">
-                 <button 
-                   type="button" 
-                   onClick={() => fileInputRef.current?.click()}
-                   className="hover:text-cyan-600 transition-colors flex items-center gap-1 text-[10px] uppercase font-black tracking-widest italic"
-                 >
-                   <ImageIcon size={18} /> MEDIA
-                 </button>
-                 <button type="button" className="hover:text-cyan-600 transition-colors cursor-not-allowed opacity-30"><Zap size={18} /></button>
-              </div>
+        <form onSubmit={handlePost} className="space-y-4">
+          <div className="flex gap-3 items-start">
+            <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 flex-shrink-0 overflow-hidden flex items-center justify-center">
+              {userProfile?.photoURL ? (
+                <img src={userProfile.photoURL} className="w-full h-full object-cover" alt="Profile" />
+              ) : (
+                <span className="text-xs font-black text-slate-400 font-mono">{userProfile?.firstName?.[0]}</span>
+              )}
+            </div>
+            <div className="flex-grow">
+              <textarea 
+                value={newPost}
+                onChange={(e) => setNewPost(e.target.value)}
+                placeholder="Share your latest professional engineering outcomes, publications, or visual updates..."
+                className="w-full bg-slate-50/50 border border-slate-100 focus:bg-white focus:border-cyan-500/20 rounded-xl p-3 text-xs md:text-sm text-slate-800 focus:outline-none transition-all resize-none h-16 md:h-18 placeholder:text-slate-400 font-medium"
+              />
+            </div>
+          </div>
+           
+          {mediaFile && (
+            <div className="relative rounded-xl overflow-hidden border border-slate-100 bg-slate-50 max-w-md mx-auto aspect-video">
+              {mediaType === 'image' ? (
+                <img src={mediaFile} className="w-full h-full object-contain" alt="Preview" />
+              ) : (
+                <video src={mediaFile} className="w-full h-full object-contain" controls />
+              )}
               <button 
-                disabled={loading || (!newPost.trim() && !mediaFile)}
-                className="bg-slate-950 text-white px-8 py-3 rounded-2xl font-black text-sm flex items-center gap-2 hover:bg-cyan-600 active:scale-[0.98] transition-all disabled:opacity-50 italic"
+                type="button"
+                onClick={() => { setMediaFile(null); setMediaType(null); }}
+                className="absolute top-2 right-2 w-7 h-7 rounded-full bg-black/60 backdrop-blur-md flex items-center justify-center text-white hover:bg-red-500 transition-colors cursor-pointer"
               >
-                {loading ? <Loader2 className="animate-spin" size={16} /> : <><Send size={16} /> Post Update</>}
+                <X size={13} />
               </button>
-           </div>
+            </div>
+          )}
+
+          <div className="flex items-center justify-between border-t border-slate-50 pt-3">
+             <div className="flex items-center gap-3">
+                <button 
+                  type="button" 
+                  onClick={() => fileInputRef.current?.click()}
+                  className="px-3 py-1.5 bg-slate-50 hover:bg-slate-100 hover:text-cyan-600 text-slate-500 rounded-xl transition-all flex items-center gap-1.5 text-[10px] font-black tracking-wider uppercase cursor-pointer animate-none"
+                >
+                  <ImageIcon size={14} className="text-slate-400" />
+                  <span>Add Media</span>
+                </button>
+                {mediaFile && (
+                  <span className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-600 border border-emerald-100 text-[9px] font-mono px-2.5 py-0.5 rounded-lg font-bold uppercase">
+                    <span className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" />
+                    MEDIA LOADED
+                  </span>
+                )}
+             </div>
+             <button 
+               disabled={loading || (!newPost.trim() && !mediaFile)}
+               className="bg-slate-900 hover:bg-cyan-600 text-white px-5 py-2 rounded-xl font-bold text-xs uppercase tracking-wider flex items-center gap-1.5 transition-all disabled:opacity-35 cursor-pointer shadow-sm active:scale-[0.98]"
+             >
+               {loading ? <Loader2 className="animate-spin text-white" size={12} /> : <><Send size={11} /> Deploy Node</>}
+             </button>
+          </div>
         </form>
       </div>
 

@@ -69,7 +69,7 @@ service cloud.firestore {
         && data.name is string && data.name.size() <= 100 && data.name.size() > 0
         && data.description is string && data.description.size() <= 1000
         && data.category is string && data.category.size() <= 50
-        && data.creatorId == request.auth.uid
+        && data.creatorId is string && data.creatorId.size() <= 128
         && data.memberCount is number && data.memberCount >= 0
         && (data.createdAt == request.time || data.get('createdAt', null) != null);
     }
@@ -144,8 +144,8 @@ service cloud.firestore {
 
     match /groups/{groupId} {
       allow read, list: if isSignedIn();
-      allow create: if isSignedIn() && isValidGroup(incoming());
-      allow update: if isSignedIn() && isValidGroup(incoming()) && (
+      allow create: if isSignedIn() && isValidGroup(incoming()) && incoming().creatorId == request.auth.uid;
+      allow update: if isSignedIn() && isValidGroup(incoming()) && incoming().creatorId == existing().creatorId && (
         incoming().diff(existing()).affectedKeys().hasOnly(['memberCount'])
         || isOwner(existing().creatorId)
       );
@@ -153,6 +153,7 @@ service cloud.firestore {
       match /members/{memberId} {
         allow read: if isSignedIn();
         allow create: if isSignedIn() && incoming().userId == request.auth.uid;
+        allow delete: if isSignedIn() && resource.data.userId == request.auth.uid;
       }
 
       match /posts/{postId} {

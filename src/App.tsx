@@ -8,6 +8,7 @@ import Search from './pages/Search';
 import Messages from './pages/Messages';
 import NewsFeed from './pages/NewsFeed';
 import Communities from './pages/Communities';
+import MyPosts from './pages/MyPosts';
 import { LayoutProvider } from './context/LayoutContext';
 
 /**
@@ -28,6 +29,7 @@ export default function App() {
           <Route path="/communities" element={<Communities />} />
           <Route path="/search" element={<Search />} />
           <Route path="/messages" element={<Messages />} />
+          <Route path="/my-posts" element={<MyPosts />} />
         </Routes>
       </Router>
     </LayoutProvider>
